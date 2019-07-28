@@ -4,7 +4,7 @@ const express = require('express')
 const passport = require('passport')
 
 // pull in Mongoose model for examples
-const Example = require('../models/example')
+const Score = require('../models/score')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -28,12 +28,18 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 // INDEX
+router.get('/all_results',(req, res, next)=>{
+  Score.find()
+  .then(scores => res.status(200).json({scores: scores}))
+  .catch(next)
+
+})
 // GET /examples
-router.get('/examples', requireToken, (req, res, next) => {
+router.get('/results', requireToken, (req, res, next) => {
   
   // Option 1 get user's examples
-  Example.find({owner: req.user.id})
-    .then(examples => res.status(200).json({examples: examples}))
+  Score.find({owner: req.user.id})
+    .then(scores => res.status(200).json({scores: scores}))
     .catch(next)
   
   // // Option 2 get user's examples
@@ -46,17 +52,17 @@ router.get('/examples', requireToken, (req, res, next) => {
 
 // SHOW
 // GET /examples/5a7db6c74d55bc51bdf39793
-router.get('/examples/:id', requireToken, (req, res, next) => {
+router.get('/results/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
-  Example.findById(req.params.id)
+  Score.findById(req.params.id)
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(example => {
+    .then(score => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, example)
+      requireOwnership(req, score)
     
-      res.status(200).json({ example: example.toObject() })
+      res.status(200).json({ score: score.toObject() })
     })
     // if an error occurs, pass it to the handler
     .catch(next)
@@ -64,14 +70,14 @@ router.get('/examples/:id', requireToken, (req, res, next) => {
 
 // CREATE
 // POST /examples
-router.post('/examples', requireToken, (req, res, next) => {
+router.post('/results', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  req.body.example.owner = req.user.id
+  req.body.score.owner = req.user.id
 
-  Example.create(req.body.example)
+  Score.create(req.body.score)
     // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(example => {
-      res.status(201).json({ example: example.toObject() })
+    .then(score => {
+      res.status(201).json({ score: score.toObject() })
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
@@ -81,20 +87,20 @@ router.post('/examples', requireToken, (req, res, next) => {
 
 // UPDATE
 // PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/results/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.example.owner
+  delete req.body.score.owner
 
-  Example.findById(req.params.id)
+  Score.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(score => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, example)
+      requireOwnership(req, score)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return example.update(req.body.example)
+      return score.update(req.body.score)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.status(204))
@@ -104,14 +110,14 @@ router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/examples/:id', requireToken, (req, res, next) => {
-  Example.findById(req.params.id)
+router.delete('/results/:id', requireToken, (req, res, next) => {
+  Score.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(score => {
       // throw an error if current user doesn't own `example`
-      requireOwnership(req, example)
+      requireOwnership(req, score)
       // delete the example ONLY IF the above didn't throw
-      example.remove()
+      score.remove()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
