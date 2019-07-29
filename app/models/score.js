@@ -9,6 +9,11 @@ const scoreSchema = new mongoose.Schema({
     type: String,
     // required: true
   },
+  game: {
+    type: Number,
+    default:1
+    // required: true
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

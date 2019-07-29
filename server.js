@@ -6,6 +6,8 @@ const cors = require('cors')
 
 // require route files
 const exampleRoutes = require('./app/routes/score_routes')
+// const PlayerRoutes = require('./app/routes/player_route')
+
 const userRoutes = require('./app/routes/user_routes')
 
 // require error handling middleware
@@ -23,6 +25,8 @@ const requestLogger = require('./lib/request_logger')
 
 // require middleware for accepting token or bearer
 const tokenOrBearer = require('./lib/token_or_bearer')
+
+const PlayerRoutes = require('./app/routes/player_route')
 
 // Define Ports
 const reactPort = 7165
@@ -63,8 +67,10 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // register route files
+app.use(PlayerRoutes) 
 app.use(exampleRoutes)
 app.use(userRoutes)
+
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be

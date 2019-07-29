@@ -10,7 +10,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  token: String
+  token: String,
+  score:Number,
+  level:Number,
+
 }, {
   timestamps: true,
   toObject: {
