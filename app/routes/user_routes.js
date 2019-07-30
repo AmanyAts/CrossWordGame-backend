@@ -56,7 +56,7 @@ router.post('/sign-up', (req, res, next) => {
         newUser =user;
         return Score.create({owner: user._id})
     })
-    .then(score => res.status(201).json({user: newUser.toObject()}))
+    .then(() => res.status(201).json({user: newUser.toObject()}))
 
     // send the new user object back with status 201, but `hashedPassword`
     // won't be send because of the `transform` in the User model
