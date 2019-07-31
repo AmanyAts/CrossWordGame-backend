@@ -5,6 +5,7 @@ const passport = require('passport')
 
 // pull in Mongoose model for examples
 const Score = require('../models/score')
+const User = require('../models/user')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -31,6 +32,8 @@ const router = express.Router()
 router.get('/all_results',(req, res, next)=>{
   Score.find()
   .then(scores => res.status(200).json({scores: scores}))
+  // User.find()
+  // .then(users => res.status(200).json({users: users}))
   .catch(next)
 
 })
@@ -73,6 +76,7 @@ router.get('/results/:id', requireToken, (req, res, next) => {
 router.post('/results', requireToken, (req, res, next) => {
   // set owner of new example to be current user
   req.body.score.owner = req.user.id
+  req.body.score.email= req.user.email
 
   Score.create(req.body.score)
     // respond to succesful `create` with status 201 and JSON of new "example"

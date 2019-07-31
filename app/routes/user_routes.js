@@ -26,10 +26,19 @@ const requireToken = passport.authenticate('bearer', { session: false })
 // instantiate a router (mini app that only handles routes)
 const router = express.Router()
 
+
+router.get('/users',(req,res,next)=>{
+  User.find()
+  .then(users => res.status(200).json({users: users}))
+  // User.find()
+  // .then(users => res.status(200).json({users: users}))
+  .catch(next)
+})
+
 // SIGN UP
 // POST /sign-up
 router.post('/sign-up', (req, res, next) => {
-  let newUser;
+  // let newUser;
   // start a promise chain, so that any errors will pass to `handle`
   Promise.resolve(req.body.credentials)
     // reject any requests where `credentials.password` is not present, or where
@@ -52,10 +61,10 @@ router.post('/sign-up', (req, res, next) => {
     })
     // create user with provided email and hashed password
     .then(user => User.create(user))
-    .then(user=>{
-        newUser =user;
-        return Score.create({owner: user._id})
-    })
+    // .then(user=>{
+    //     newUser =user;
+    //     return Score.create({owner: user._id})
+    // })
     .then(() => res.status(201).json({user: newUser.toObject()}))
 
     // send the new user object back with status 201, but `hashedPassword`
